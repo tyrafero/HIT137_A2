@@ -17,7 +17,7 @@ key = total
 print(key)
 
 # Writing the decryption function to decrypt the ‘encrypted code’ to the original code
-original_code = """
+encrypted_code = """
 tybony_inevnoyr = 100
 zl_qvpg = {'xrl1": "inyhr1', 'xrl2': 'inyhr2', 'xrl3': 'inyhr3')
 
@@ -76,7 +76,7 @@ def decrypt(encrypted_text, key):
             decrypted_text += char
     return decrypted_text
 
-decrypted_code = decrypt(original_code, key)
+decrypted_code = decrypt(encrypted_code, key)
 
 # Correcting the errors and providing the comments.
 # Initializing global variables
