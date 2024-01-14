@@ -15,16 +15,27 @@ file_path = "output/test.txt"
 with open(file_path, 'r', encoding='utf-8') as file:
     text = file.read()
 
+# Truncate the text if it exceeds the maximum sequence length
+max_sequence_length = 512
+truncated_text = text[:max_sequence_length]
+
 # Extract disease entities using en_core_sci_sm
-doc_sci_sm = nlp_sci_sm(text)
+doc_sci_sm = nlp_sci_sm(truncated_text)
 diseases_sci_sm = [ent.text for ent in doc_sci_sm.ents if ent.label_ == 'DISEASE']
 
-# Extract disease and drug entities using BioBERT
-inputs = tokenizer.encode_plus(text, return_tensors='pt')
+# Encode the truncated text
+inputs = tokenizer.encode_plus(truncated_text, return_tensors='pt')
 input_ids = inputs['input_ids']
 attention_mask = inputs['attention_mask']
+
+# Adjust the input_ids and attention_mask if they exceed the maximum sequence length
+if input_ids.shape[1] > max_sequence_length:
+    input_ids = input_ids[:, :max_sequence_length]
+    attention_mask = attention_mask[:, :max_sequence_length]
+
+# Pass the adjusted inputs to the model
 outputs = model(input_ids, attention_mask=attention_mask)
-predicted_labels = torch.argmax(outputs.logits, dim=-1)[0]
+predicted_labels = torch.argmax(outputs.last_hidden_state, dim=-1)[0]
 predicted_entities = [tokenizer.decode(input_ids[0][i]) for i, label in enumerate(predicted_labels) if label.item() == 1]
 
 # Filter out disease and drug entities from BioBERT predictions
